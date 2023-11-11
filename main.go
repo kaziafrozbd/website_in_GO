@@ -83,8 +83,8 @@ func request(w http.ResponseWriter, r *http.Request){
 	company := r.FormValue("company")
 	email := r.FormValue("email")
 
-	// fmt.Println(name, comapny, email)
-	// fmt.Fprintf(w,"received \n %s \n %s \n %s", name, comapny, email)
+	// fmt.Println(name, company, email)
+	// fmt.Fprintf(w,"received \n %s \n %s \n %s", name, company, email)
 	// r.ParseForm()
 	// for key, val := range r.Form{
 	// 	fmt.Println(key, val)
