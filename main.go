@@ -130,7 +130,7 @@ func request(w http.ResponseWriter, r *http.Request){
 	// fmt.Fprintf(w,`ok`)
 
 	var rT requestTable
-	r.Form.Add("aid", "request::302")
+	r.Form.Add("aid", "request::303")
 	r.Form.Add("bucket", "test")
 	r.Form.Add("type", "request")
 	r.Form.Add("status", "1")
