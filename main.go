@@ -1,34 +1,47 @@
 package main
 
 import (
-	"database/sql"
+	// "database/sql"
 	"fmt"
 	"net/http"
-	"text/template"
+	"html/template"
+	"os"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/mateors/mcb"
+
+	// _ "github.com/go-sql-driver/mysql"
 )
-var db *sql.DB
+// var db *sql.DB
+var db *mcb.DB
 var err error
 func init(){
 	
     // Open up our database connection.
     // I've set up a database on my local machine using phpmyadmin.
     // The database is called testDb
-    db, err = sql.Open("mysql", "root:hosting123@tcp(127.0.0.1:3306)/webhosting_db")
+    // db, err = sql.Open("mysql", "root:hosting123@tcp(127.0.0.1:3306)/webhosting_db")
 
-    // if there is an error opening the connection, handle it
-    if err != nil {
-        panic(err.Error())
-    }
+    // // if there is an error opening the connection, handle it
+    // if err != nil {
+    //     panic(err.Error())
+    // }
 
     // defer the close till after the main function has finished
     // executing
-    // defer db.Close()
+    // defer db.Close()    
+	// fmt.Println("db connected..")
 
-	
-    
-	fmt.Println("db connected..")
+	db = mcb.Connect("localhost", "kazi", "kazi123", false)
+
+	res, err := db.Ping()
+	if err != nil {
+
+		fmt.Println(res)
+		os.Exit(1)
+	}
+	fmt.Println(res, err)
+
+
 }
 
 func main() {
@@ -77,31 +90,55 @@ func docs(w http.ResponseWriter, r *http.Request){
 
 	// fmt.Fprintf(w,`welcome`)
 }
+
+type requestTable struct {
+	ID int `json:"aid"`
+	Name       string   `json:"name"`
+	Company    string   `json:"company"`
+	Email string   `json:"email"`
+	Type       string   `json:"type"`
+	Status int `json:"status"`
+}
+
+
 func request(w http.ResponseWriter, r *http.Request){
 	
-	name := r.FormValue("name")
-	company := r.FormValue("company")
-	email := r.FormValue("email")
+	// name := r.FormValue("name")
+	// company := r.FormValue("company")
+	// email := r.FormValue("email")
 
 	// fmt.Println(name, company, email)
 	// fmt.Fprintf(w,"received \n %s \n %s \n %s", name, company, email)
-	// r.ParseForm()
-	// for key, val := range r.Form{
-	// 	fmt.Println(key, val)
-	// }
+	r.ParseForm()
+	for key, val := range r.Form{
+		fmt.Println(key, val)
+	}
 
 	// perform a db.Query insert
-	sq := "INSERT INTO `request` (`id`, `name`, `company`, `email`, `status`) VALUES (NULL, '%s', '%s', '%s', '1')"
-	sql := fmt.Sprintf(sq, name, company, email)
+	// sq := "INSERT INTO `request` (`id`, `name`, `company`, `email`, `status`) VALUES (NULL, '%s', '%s', '%s', '1')"
+	// sql := fmt.Sprintf(sq, name, company, email)
 
-	// fmt.Println(sql)
-    insert, err := db.Query(sql)
+	// // fmt.Println(sql)
+    // insert, err := db.Query(sql)
 
-    // if there is an error inserting, handle it
-    if err != nil {
-        panic(err.Error())
-    }
-    // be careful deferring Queries if you are using transactions
-    defer insert.Close()
-	fmt.Fprintf(w,`ok`)
+    // // if there is an error inserting, handle it
+    // if err != nil {
+    //     panic(err.Error())
+    // }
+    // // be careful deferring Queries if you are using transactions
+    // defer insert.Close()
+	// fmt.Fprintf(w,`ok`)
+
+	var rT requestTable
+	r.Form.Add("aid", "request::302")
+	r.Form.Add("bucket", "test")
+	r.Form.Add("type", "request")
+	r.Form.Add("status", "1")
+	pRes := db.Insert(r.Form, &rT)
+	fmt.Println(pRes.Status, pRes.Errors)
+
+	fmt.Fprintf(w, `OK`)
+
+
+	
 }
